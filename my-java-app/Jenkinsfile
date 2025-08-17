@@ -1,45 +1,51 @@
 pipeline {
-  agent any
+    agent any
 
-  tools {
-    maven 'Maven 3.8.7'
-  }
-
-  environment {
-    IMAGE_NAME = 'rramm/my-java-app'
-    IMAGE_TAG  = "${env.BUILD_NUMBER}"
-    DOCKERHUB_CREDENTIALS = 'dockerhub-creds'
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-        sh 'ls -R .'
-      }
+    tools {
+        maven 'Maven 3.8.7'
     }
 
-    stage('Build & Push') {
-      steps {
-        dir('my-java-app') {
-          sh 'ls -R .'
-          sh 'mvn clean package -DskipTests'
+    environment {
+        IMAGE_NAME = 'rramm/my-java-app'          // Docker Hub image name
+        IMAGE_TAG = "${env.BUILD_NUMBER}"         // Use Jenkins build number as image tag
+        DOCKERHUB_CREDENTIALS = 'dockerhub-creds' // Credentials ID stored in Jenkins credentials manager
+    }
 
-          script {
-            docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-            docker.withRegistry('https://registry.hub.docker.com', DOCKERHUB_CREDENTIALS) {
-              docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push()
-              docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push('latest')
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                sh 'ls -R .'  // List files to verify the workspace
             }
-          }
         }
-      }
-    }
-  }
 
-  post {
-    always {
-      cleanWs()
+        stage('Build & Push') {
+            steps {
+                dir('my-java-app') {
+                    sh 'ls -R .'  // List files in the sub-directory (if relevant)
+                    sh 'mvn clean package -DskipTests' // Build the Maven project, skip tests
+
+                    script {
+                        // Build the Docker image
+                        docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
+
+                        // Push the image to Docker Hub
+                        docker.withRegistry('https://registry.hub.docker.com', DOCKERHUB_CREDENTIALS) {
+                            // Push the image with the specific build number tag
+                            docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push()
+
+                            // Optionally, also push it with the 'latest' tag
+                            docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push('latest')
+                        }
+                    }
+                }
+            }
+        }
     }
-  }
+
+    post {
+        always {
+            cleanWs()  // Clean the workspace after the build
+        }
+    }
 }
