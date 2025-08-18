@@ -4,21 +4,33 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.5</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
     <groupId>com.example</groupId>
     <artifactId>my-java-app</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>My Java Application</name>
-    <description>A simple Java application with Docker integration</description>
+    <description>A simple Java Spring Boot application with Docker integration</description>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <java.version>17</java.version> <!-- Spring Boot 3 requires Java 17+ -->
     </properties>
 
     <dependencies>
-        <!-- Example dependency -->
+        <!-- Spring Boot Web (gives you REST endpoints, embedded Tomcat, etc.) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Example: Apache commons (kept from your original pom) -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -28,7 +40,13 @@
 
     <build>
         <plugins>
-            <!-- Maven Jar Plugin for manifest customization -->
+            <!-- Spring Boot Maven Plugin: builds runnable JAR -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <!-- Maven Jar Plugin (can be optional since spring-boot handles Main-Class) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -36,14 +54,13 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Main-Class>com.example.App</Main-Class>
                             <Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
                         </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
 
-            <!-- Maven Docker Plugin for Docker integration -->
+            <!-- Docker Plugin (kept from your original pom) -->
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
