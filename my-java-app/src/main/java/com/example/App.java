@@ -13,6 +13,7 @@ public class App {
 
     @GetMapping("/")
     public String hello() {
-        return "Hello, Docker and Jenkins & Kube!";
+        return "Hello, Docker and Jenkins & Kube & netes!";
     }
 }
+
