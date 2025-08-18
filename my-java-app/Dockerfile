@@ -1,5 +1,5 @@
 # First stage: Build with Maven + JDK 17
-FROM maven:3.8.7-openjdk-17 AS build
+FROM maven:3.8.7-openjdk-18 AS build
 
 WORKDIR /app
 
@@ -21,3 +21,4 @@ EXPOSE 8081
 
 # Run the app
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
